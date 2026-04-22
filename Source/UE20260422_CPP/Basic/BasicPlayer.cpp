@@ -7,6 +7,8 @@
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
 
+#include "Kismet/KismetMathLibrary.h"
+
 ABasicPlayer::ABasicPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -45,16 +47,29 @@ void ABasicPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	{
 		EIC->BindAction(IA_Move, ETriggerEvent::Triggered, this, &ABasicPlayer::Move);
 		EIC->BindAction(IA_Look, ETriggerEvent::Triggered, this, &ABasicPlayer::Look);
+		EIC->BindAction(IA_Jump, ETriggerEvent::Triggered, this, &ABasicPlayer::Jump);
+		EIC->BindAction(IA_Jump, ETriggerEvent::Completed, this, &ABasicPlayer::StopJumping);
+		EIC->BindAction(IA_Jump, ETriggerEvent::Canceled, this, &ABasicPlayer::StopJumping);
 	}
 }
 
 void ABasicPlayer::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
+
+	FRotator ControllerRotation = GetControlRotation();
+	FRotator CameraRotation = FRotator(0, ControllerRotation.Yaw, 0);
+	FVector ForwardVector = UKismetMathLibrary::GetForwardVector(CameraRotation);
+	FVector RightVector = UKismetMathLibrary::GetRightVector(CameraRotation);
+
+	AddMovementInput(ForwardVector * MovementVector.X);
+	AddMovementInput(RightVector  * MovementVector.Y);
 }
 
 void ABasicPlayer::Look(const FInputActionValue& Value)
 {
 	FVector2D LookVector = Value.Get<FVector2D>();
-}
 
+	AddControllerPitchInput(LookVector.Y);
+	AddControllerYawInput(LookVector.X);
+}
