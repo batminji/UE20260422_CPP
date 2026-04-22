@@ -8,8 +8,9 @@ public class UE20260422_CPPEditorTarget : TargetRules
 	public UE20260422_CPPEditorTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
-		DefaultBuildSettings = BuildSettingsVersion.V6;
+        DefaultBuildSettings = BuildSettingsVersion.Latest;
+        IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_7;
 
-		ExtraModuleNames.AddRange( new string[] { "UE20260422_CPP" } );
+        ExtraModuleNames.AddRange( new string[] { "UE20260422_CPP" } );
 	}
 }
